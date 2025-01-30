@@ -84,21 +84,22 @@ def diff_picks(catalogue,event_id,bulletin1,bulletin2):
     #create pick list from bulletin files
     bul1_picks,info = list_picks(catalogue,bulletin1,event_id)
     bul2_picks,info = list_picks(catalogue,bulletin2,event_id)
-    print('    > bulletin_1 has', bul1_picks.shape[0], 'times; bulletin_2 has', bul2_picks.shape[0])
+    print('    > bulletin_1 has', bul1_picks.shape[0], 'P times; bulletin_2 has', bul2_picks.shape[0])
+    
     merge_picks = pd.merge(bul1_picks.sort_index(), bul2_picks.sort_index(), on=['sta','net'], how='inner', suffixes=['1','2'])
-    merge_picks['time1_seconds'] = (merge_picks['time1']['P'] - ev_origin_time).dt.total_seconds()
-    merge_picks['time2_seconds'] = (merge_picks['time2']['P'] - ev_origin_time).dt.total_seconds()
-    #find time difference between the two pick lists
-    merge_picks['time_diff_seconds'] = merge_picks['time2_seconds'] - merge_picks['time1_seconds']
-    #filter all zero elements from dataframe
-    zero_merge_picks = merge_picks[merge_picks['time_diff_seconds'] == 0].dropna(how='all').dropna(axis=1,how='all')
-
-    if merge_picks.shape[0] == zero_merge_picks.shape[0] :
-        print('    > all common station and phase picks are equal\n')
-        return
-    else :
-        nonzero_merge_picks = merge_picks[merge_picks['time_diff_seconds'] != 0].dropna(how='all').dropna(axis=1,how='all')
-        print('    > out of', merge_picks.shape[0], 'common station and phase picks.', nonzero_merge_picks.shape[0], 'pick times are different\n' )
+    
+    merge_picks['Ptime1_seconds'] = (merge_picks['time1']['P'] - ev_origin_time).dt.total_seconds()
+    merge_picks['Ptime2_seconds'] = (merge_picks['time2']['P'] - ev_origin_time).dt.total_seconds()
+    merge_picks['Ptime_diff_seconds'] = (merge_picks['Ptime2_seconds'] - merge_picks['Ptime1_seconds'])
+    nonzero_merge_picks = merge_picks[merge_picks['Ptime_diff_seconds'].notna() & (merge_picks['Ptime_diff_seconds'] != 0)]
+    
+    # Filter all zero elements from dataframe
+    if nonzero_merge_picks['Ptime_diff_seconds'].isna().all():
+        print('    > No common station and phase picks found between the two bulletins\n')
+        return None
+    else:
+    #zero_merge_picks = merge_picks[merge_picks['Ptime_diff_seconds'] == 0].dropna(how='all').dropna(axis=1, how='all')
+        print('    > out of', merge_picks.shape[0], 'common station and phase picks.', nonzero_merge_picks.shape[0], 'pick times are different\n')
         return nonzero_merge_picks
 
 ##################################################################
