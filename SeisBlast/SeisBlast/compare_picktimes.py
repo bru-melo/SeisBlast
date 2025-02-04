@@ -128,9 +128,33 @@ def get_wave(catalogue, event_id, bulletin_dir, i):
 # simple view of the waveform with picks
 ##################################################################
 
-def plot_wave(df,wf,origin,tmin,tmax,fmin,fmax,ind):
+def plot_wave(df,info,tmin,tmax,fmin,fmax,ind):
+    """
+    Plots a seismogram waveform with P and S pick times.
+
+    Parameters:
+    df (DataFrame): DataFrame containing pick times with columns 'time', 'P', and 'S'.
+    wf (Stream): Seismogram waveform data.
+    origin (UTCDateTime): Origin time of the event.
+    tmin (float): Minimum time relative to the origin to start the plot.
+    tmax (float): Maximum time relative to the origin to end the plot.
+    fmin (float): Minimum frequency for bandpass filter.
+    fmax (float): Maximum frequency for bandpass filter.
+    ind (int): Index of the pick times in the DataFrame to plot.
+
+    Returns:
+    None
+    """
 
     #slice and filter the seismogram
+        #read the waveform
+    ev_net = df['net'][ind]
+    ev_station = df['sta'][ind]
+    origin = UTCDateTime(info['DATE'] + info['TIME'])
+    evdir = '/mnt/REPO/IRELAND/' + str(origin.year) + '/'+ ev_net +'/'+ ev_station + '/HHZ.D/'
+    evfile = glob.glob(evdir + ev_net + '.' + ev_station + '.*.HHZ.D.' + str(origin.year) + '.' + str(origin.julday))
+    wf = read(evfile[0])
+    
     wf_filt = wf.copy()
     wf_filt.filter('bandpass', freqmin=fmin, freqmax=fmax, corners=2, zerophase=True)
     start = origin + tmin

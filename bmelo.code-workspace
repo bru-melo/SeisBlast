@@ -6,6 +6,9 @@
 		{
 			"name": "SeisBlast",
 			"path": "."
+		},
+		{
+			"path": "../../../../mnt/REPO"
 		}
 	],
 	"settings": {}
