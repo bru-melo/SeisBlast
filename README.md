@@ -1,4 +1,6 @@
 # SeisBlast
+
+[In the proccess of getting organized...]
 Python codes for sorting, visualising and processing quarry blast seismic data.
 Most codes use functions from the SeisBlast package.
 
