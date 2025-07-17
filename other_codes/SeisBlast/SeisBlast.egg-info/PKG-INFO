@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: SeisBlast
+Version: 0.1
+Summary: A package for reading, comparing and plotting quarry blast seismic data
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: matplotlib
